@@ -5,6 +5,8 @@ let CONFIG = {
   mqtt_topic: "ruuvi",
   xiaomi_1: "a4:c1:38:2c:12:b3",
   xiaomi_2: "a4:c1:38:1f:fc:29",
+  xiaomi_3: "a4:c1:38:bd:4f:aa",
+  xiaomi_4: "a4:c1:38:3b:8b:25",
 };
 
 let RUUVI_MFD_ID = 0x0499;
@@ -77,15 +79,15 @@ let packedStruct = {
 let RuuviParser = {
   getData: function (res) {
 
-    if (res.addr == CONFIG.xiaomi_1 || res.addr == CONFIG.xiaomi_2) {
+    if (res.addr == CONFIG.xiaomi_1 || res.addr == CONFIG.xiaomi_2 || res.addr == CONFIG.xiaomi_3 || res.addr == CONFIG.xiaomi_4) {
 
       //print("xiaomi found",res.addr);
       //print("Bytes of data",res.advData.length);
 
       packedStruct.setBuffer(res.advData);
-      
-      let rm = packedStruct.unpack('<BBBBBBBBBBBBBhHH', [
-        'b1','b2','b3','b4','b5','b6','b7','b8','b9','b10','b11','b12','b13',
+  
+      let rm = packedStruct.unpack('<BBBBBBBBBBhHH', [
+        'b1','b2','b3','b4','b5','b6','b7','b8','b9','b10',
         'temp',
         'humidity',
         'batt'
@@ -93,7 +95,7 @@ let RuuviParser = {
 
       rm.temp = rm.temp * 0.01; 
       rm.humidity = rm.humidity * 0.01;
-      rm.batt = rm.batt * 0.001,
+      rm.batt = rm.batt * 0.001;
       rm.addr = res.addr.slice(0, -2);
       rm.rssi = res.rssi;
       return rm;
@@ -122,6 +124,9 @@ let RuuviParser = {
         'sequence',
         'mac_0','mac_1','mac_2','mac_3','mac_4','mac_5'
       ]);
+
+      //print("ruuvi found",res.addr);
+
       rm.temp = rm.temp * 0.005;
       rm.humidity = rm.humidity * 0.0025;
       rm.pressure = rm.pressure + 50000;
