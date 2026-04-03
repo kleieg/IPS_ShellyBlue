@@ -49,7 +49,7 @@ class ShellyBluRCButton4 extends IPSModule
 
 
         if(isset($Payload['Button1'])) {
-            $this->SetValue('Button1', $Payload['Button1');
+            $this->SetValue('Button1', $Payload['Button1']);
         }
         if(isset($Payload['Button2'])) {
             $this->SetValue('Button2', $Payload['Button2']);
