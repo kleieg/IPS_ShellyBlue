@@ -1,6 +1,6 @@
 <?php
 
-class ShellyBluRuuvi extends IPSModule
+class ShellyBluRCButton4 extends IPSModule
 {
     public function Create()
     {
@@ -13,10 +13,13 @@ class ShellyBluRuuvi extends IPSModule
         $this->RegisterPropertyString('Address', '');
 
         // variables
-        $this->RegisterVariableFloat("Temperature", "Temperature", "~Temperature");
-        $this->RegisterVariableFloat("Humidity", "Humidity", "~Humidity.F");
-        $this->RegisterVariableFloat("Battery", "Battery", '~Volt');
+        $this->RegisterVariableInteger("Button4", "Button4");
+        $this->RegisterVariableInteger("Button1", "Button1");
+        $this->RegisterVariableInteger("Button2", "Button2");
+        $this->RegisterVariableInteger("Button3", "Button3");
+        $this->RegisterVariableInteger("Battery", "Battery", '~Battery.100');
 
+        $this->SetBuffer('pid', serialize(255));
     }
 
     public function ApplyChanges()
@@ -35,15 +38,30 @@ class ShellyBluRuuvi extends IPSModule
 
         $Buffer = json_decode($JSONString, true);
         $Payload = json_decode($Buffer['Payload'], true);
+        if(!isset($Payload['pid'])) return;
 
-        if(isset($Payload['temp'])) {
-            $this->SetValue('Temperature', $Payload['temp']);
+        // deduplicate packages (e.g., if multiple gateways are receiving..)
+        // packet id must be larger/newer than previous.. but allow for rollover if difference is large enough (e.g., 30 = 5m, assuming 1 packet every ~10s)
+        $lastPID = unserialize($this->GetBuffer('pid'));
+        $pid = intval($Payload['pid']);
+        if($pid <= $lastPID && ($lastPID - $pid < 30)) return;
+        $this->SetBuffer('pid', serialize($pid));
+
+
+        if(isset($Payload['Button1'])) {
+            $this->SetValue('Button1', $Payload['Button1');
         }
-        if(isset($Payload['humidity'])) {
-            $this->SetValue('Humidity', $Payload['humidity']);
+        if(isset($Payload['Button2'])) {
+            $this->SetValue('Button2', $Payload['Button2']);
         }
-        if(isset($Payload['batt'])) {
-            $this->SetValue('Battery', $Payload['batt']);
+        if(isset($Payload['Button3'])) {
+            $this->SetValue('Button3', $Payload['Button3']);
+        }
+        if(isset($Payload['Button4'])) {
+            $this->SetValue('Button4', $Payload['Button4']);
+        }
+        if(isset($Payload['Battery'])) {
+            $this->SetValue('Battery', $Payload['Battery']);
         }
     }
 

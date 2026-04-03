@@ -4,7 +4,7 @@
             {
                 "name": "Address",
                 "type": "ValidationTextBox",
-                "caption": "MQTT Topic"
+                "caption": "BLE Address"
             }
         ]
 }
